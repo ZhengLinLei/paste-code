@@ -353,6 +353,12 @@ window.addEventListener('load', () => {
             WINDOW_CONFIG.parent.appendChild(windowParent);
             WINDOW_CONFIG.windows.push(newWindow);
             WINDOW_CONFIG.current++;
+            WINDOW_CONFIG.parent.classList.remove('odd');
+
+
+            if (WINDOW_CONFIG.current % 2 != 0) {
+                WINDOW_CONFIG.parent.classList.add('odd');
+            }
 
             // Code insert
             WINDOW_CONFIG.codeWindow.push(code);
@@ -365,7 +371,6 @@ window.addEventListener('load', () => {
     const removeWindow = () => {
         if (WINDOW_CONFIG.current > WINDOW_CONFIG.min) {
             // Remove last window
-            console.log(WINDOW_CONFIG.focus);
             WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement);
             // Remove from array resetting index
             WINDOW_CONFIG.windows = WINDOW_CONFIG.windows.filter((win, index) => index != WINDOW_CONFIG.focus);
@@ -374,10 +379,14 @@ window.addEventListener('load', () => {
 
             WINDOW_CONFIG.current--;
 
+            WINDOW_CONFIG.parent.classList.remove('odd');
+            if (WINDOW_CONFIG.current % 2 != 0) {
+                WINDOW_CONFIG.parent.classList.add('odd');
+            }
+
             // Update class
-            console.log(WINDOW_CONFIG.windows, WINDOW_CONFIG.codeWindow);   // ISSUE #13
+            //console.log(WINDOW_CONFIG.windows, WINDOW_CONFIG.codeWindow);   // ISSUE #13
             WINDOW_CONFIG.windows.forEach((win, index) => {
-                console.log(win)
                 // Remove all classlist
                 win.parentElement.classList.remove(...win.parentElement.classList);
                 win.parentElement.classList.add(`w-${index}`);
