@@ -89,6 +89,7 @@ window.addEventListener('load', () => {
         label: 'Window',
         current: 0,
         focus: 0,   // ISSUE #13
+        visible: 0,
         windows: [],
         codeWindow: [],
         windows_value: [],
@@ -187,6 +188,32 @@ window.addEventListener('load', () => {
     }
 
     // ==== ADD WINDOWS =========
+    function visibilityFullSpan() {
+        WINDOW_CONFIG.parent.classList.remove('odd-3');
+        WINDOW_CONFIG.parent.classList.remove('odd-4');
+        if(WINDOW_CONFIG.visible == 3) {
+            // Windows 4
+            if(WINDOW_CONFIG.current == 3) {
+                WINDOW_CONFIG.parent.classList.add('odd-3');
+                return;
+            }
+            
+            // Algorithm:
+            // If w-2 is open and w-4
+            // The focus span 2 is for w-2
+            let hide = [
+                WINDOW_CONFIG.windows[2].parentElement.style.display == 'none',
+                WINDOW_CONFIG.windows[3].parentElement.style.display == 'none'
+            ];
+
+            // Check
+            if(!hide[0] && hide[1]) {
+                WINDOW_CONFIG.parent.classList.add('odd-3');
+            }
+
+            WINDOW_CONFIG.parent.classList.add('odd-4');
+        }
+    }
 
     const addWindow = () => {
         if (WINDOW_CONFIG.current < WINDOW_CONFIG.max) {
@@ -199,6 +226,38 @@ window.addEventListener('load', () => {
 
                 // Set focus
                 WINDOW_CONFIG.focus = index;
+            });
+
+            windowParent.addEventListener('dblclick', () => {
+                // Get focus and close window
+                if (WINDOW_CONFIG.visible > 1) {
+                    document.querySelector('.hidden-tab').classList.add('demo');
+                    setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
+                    windowParent.style.display = 'none';
+                    WINDOW_CONFIG.visible--;
+
+                    // Odd
+                    visibilityFullSpan();
+
+                    let a = document.createElement('a');
+                    a.onclick = (e) => {
+                        windowParent.style.display = 'block';
+                        a.remove();
+
+                        WINDOW_CONFIG.focus = windowParent.classList[0].replace('w-', '');
+                        WINDOW_CONFIG.visible++;
+
+                        visibilityFullSpan(true);
+                    }
+                    let lang;
+                    try {
+                        lang = windowParent.querySelector('pre').classList[0].replace('language-', '');
+                    } catch(e) {
+                        lang = '';
+                    }
+                    a.innerHTML = `[${(lang.length > 0 && lang != 'none') ? `${lang.toUpperCase()}-${WINDOW_CONFIG.focus}` : WINDOW_CONFIG.focus}]`
+                    document.querySelector('.hidden-tab').appendChild(a);
+                }
             });
             //
             const codeWindow = document.createElement('pre');
@@ -353,11 +412,42 @@ window.addEventListener('load', () => {
             WINDOW_CONFIG.parent.appendChild(windowParent);
             WINDOW_CONFIG.windows.push(newWindow);
             WINDOW_CONFIG.current++;
-            WINDOW_CONFIG.parent.classList.remove('odd');
+            WINDOW_CONFIG.visible++;
+            WINDOW_CONFIG.parent.classList.remove('odd-3');
+            WINDOW_CONFIG.parent.classList.remove('odd-4');
 
+            // switch (WINDOW_CONFIG.current) {
+            //     case 1:
+            //         break;
+            //     case 2:
+            //         break;
+            //     case 3:
+            //         visibilityFullSpan();
+            //         break;
+            //     case 4:
+            //         break;
+            // }
+            visibilityFullSpan();
 
-            if (WINDOW_CONFIG.current % 2 != 0) {
-                WINDOW_CONFIG.parent.classList.add('odd');
+            if (WINDOW_CONFIG.current == 2 || WINDOW_CONFIG.current == 4) {
+                let l1 = document.createElement('div');
+                l1.classList.add('LR');
+                l1.classList.add('LR-1');
+                windowParent.appendChild(l1);
+
+                // ['mousedown','touchstart'].forEach( evt => {
+                //     l1.addEventListener(evt, (e) => _fncStartResize(e, "x", other = true, windowParent)); ----------------------> Discuss in the future
+                // });
+            }
+            if (WINDOW_CONFIG.current == 2 || WINDOW_CONFIG.current == 3 || WINDOW_CONFIG.current == 4) {
+                let t = document.createElement('div');
+                t.classList.add('TB');
+                t.classList.add('TB-' + (WINDOW_CONFIG.current - 2));
+                windowParent.appendChild(t);
+
+                // ['mousedown','touchstart'].forEach( evt => {
+                //     t.addEventListener(evt, (e) => _fncStartResize(e, "y", other = true, windowParent)); ----------------------> Discuss in the future
+                // });
             }
 
             // Code insert
@@ -365,12 +455,30 @@ window.addEventListener('load', () => {
 
             // Update attribute for window
             windowParent.classList.add(`w-${WINDOW_CONFIG.current-1}`);         // ------> To update Line Numbers Padding
+
+            return true;
+        }
+
+        if (WINDOW_CONFIG.visible > 0) {
+            document.querySelector('.hidden-tab').classList.add('demo');
+            setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
         }
     }
     // ===== REMOVE WINDOWS =====
     const removeWindow = () => {
-        if (WINDOW_CONFIG.current > WINDOW_CONFIG.min) {
-            // Remove last window
+        if (WINDOW_CONFIG.current > WINDOW_CONFIG.min && WINDOW_CONFIG.visible > WINDOW_CONFIG.min) {
+            // Remove last visible window
+            do {
+                console.log(WINDOW_CONFIG.focus);
+                if (WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement.style.display != 'none')
+                    break;
+
+                
+                if (WINDOW_CONFIG.focus == 0) 
+                    WINDOW_CONFIG.focus = WINDOW_CONFIG.current - 1; // 0 to 3
+                else
+                    WINDOW_CONFIG.focus--;
+            } while (true);
             WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement);
             // Remove from array resetting index
             WINDOW_CONFIG.windows = WINDOW_CONFIG.windows.filter((win, index) => index != WINDOW_CONFIG.focus);
@@ -378,11 +486,9 @@ window.addEventListener('load', () => {
             WINDOW_CONFIG.codeWindow = WINDOW_CONFIG.codeWindow.filter((win, index) => index != WINDOW_CONFIG.focus);  // Remove code window ISSUE #7 and #13
 
             WINDOW_CONFIG.current--;
+            WINDOW_CONFIG.visible--;
 
-            WINDOW_CONFIG.parent.classList.remove('odd');
-            if (WINDOW_CONFIG.current % 2 != 0) {
-                WINDOW_CONFIG.parent.classList.add('odd');
-            }
+            visibilityFullSpan();
 
             // Update class
             //console.log(WINDOW_CONFIG.windows, WINDOW_CONFIG.codeWindow);   // ISSUE #13
@@ -391,11 +497,100 @@ window.addEventListener('load', () => {
                 win.parentElement.classList.remove(...win.parentElement.classList);
                 win.parentElement.classList.add(`w-${index}`);
             });
+
+            return true;
         }
+
+        document.querySelector('.hidden-tab').classList.add('demo');
+        setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
     }
 
     // === Close text offer =====
     const closeOffer = () =>  document.querySelector("body > footer").classList.remove("text-offer");
+
+    // ==== RESIZE ====
+    // Get (x,y) position of event
+    const _getXY = (e) => {
+        if(e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
+            var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+            var touch = evt.touches[0] || evt.changedTouches[0];
+                
+            x = touch.pageX;
+            y = touch.pageY;
+        } else if (e.type == 'mousedown' || e.type == 'mouseup' || e.type == 'mousemove' || e.type == 'mouseover'|| e.type=='mouseout' || e.type=='mouseenter' || e.type=='mouseleave') {
+            x = e.clientX;
+            y = e.clientY;
+        }
+        return {x, y};
+    }
+    // Start resize
+    const _fncStartResize = (e, type, other = false, parent = null) => {
+        let _Y = (type === "y");
+        // If the event is touchstart
+        let coords = _getXY(e);
+        let _PARENT, _MAX, _MIN;
+        if (!other) {
+            _PARENT = (_Y) ? terminal.parentElement.parentElement : document.querySelector('#terminal-fast-option');
+            // Resize terminal height
+            _MAX = _Y ? window.innerHeight * 0.8 : window.innerWidth * 0.5;
+            _MIN = _Y ? window.innerHeight * 0.2 : window.innerWidth * 0.1;
+        } else {
+            _PARENT = parent;
+            _MAX = _Y ? window.innerHeight * 0.9 : window.innerWidth * 0.5;
+            _MIN = _Y ? window.innerHeight * 0.1 : window.innerWidth * 0.1;
+        }
+        let _SIZE = _PARENT.getBoundingClientRect()[_Y ? "height" : "width"];
+        let _START = coords[type];
+            
+        const fncTouch = (e2) => {
+            // Remove if the event is passive
+            if(!['touchstart', 'touchmove', 'touchend', 'touchcancel'].includes(e.type)){
+                e2.preventDefault();
+            }
+                
+            // If the event is touchstart
+            let coordsM = _getXY(e2);
+
+            document.body.classList.add(_Y ? 'row-resize' : 'col-resize');
+
+            let _NEW_SIZE = _SIZE - (coordsM[type] - _START); // - (e.clientY - _START); ---> Because the height grows from bottom to top
+            
+            if(_NEW_SIZE > _MIN && _NEW_SIZE < _MAX)
+                (_Y) 
+                ?
+                    _PARENT.style.height = `${_NEW_SIZE}px`    
+                :
+                    (!other)
+                    ?
+                        (document.documentElement || document.querySelector(':root')).style.setProperty('--termOption', `${_NEW_SIZE}px`)
+                    :
+                        parent.style.width = `${_NEW_SIZE}px`;
+        }
+        window.onmousemove = fncTouch;
+        window.ontouchmove = fncTouch;
+
+        window.onmouseup = () => _fncEndResize(type, other);
+        window.ontouchend = () => _fncEndResize(type, other);
+    };
+    // End resize
+    const _fncEndResize = (type, other = false) => {
+        let _Y = (type === "y");
+
+        document.body.classList.remove(_Y ? 'row-resize' : 'col-resize');
+
+        window.onmousemove = null;
+        window.ontouchmove = null;
+        window.onmouseup = null;
+        window.ontouchend = null;
+
+        // Save terminal height and option width
+
+        if (!other)
+            localStorage.setItem(
+                _Y ? 'terminalHeight' : 'terminalOptWidth',
+                _Y ? terminal.parentElement.parentElement.getBoundingClientRect().height : document.querySelector('#terminal-fast-option').getBoundingClientRect().width
+            );
+    };
 
     // ==== MAIN =========
     // Global MAIN variables
@@ -644,81 +839,6 @@ window.addEventListener('load', () => {
         document.querySelectorAll('.terminal-option').forEach(option => {
             option.addEventListener('click', () => _option_click(option.getAttribute('data-option')));
         });
-
-
-        // ==== RESIZE ====
-        // Get (x,y) position of event
-        const _getXY = (e) => {
-            if(e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
-                var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
-                var touch = evt.touches[0] || evt.changedTouches[0];
-                
-                x = touch.pageX;
-                y = touch.pageY;
-            } else if (e.type == 'mousedown' || e.type == 'mouseup' || e.type == 'mousemove' || e.type == 'mouseover'|| e.type=='mouseout' || e.type=='mouseenter' || e.type=='mouseleave') {
-                x = e.clientX;
-                y = e.clientY;
-            }
-            return {x, y};
-        }
-        // Start resize
-        const _fncStartResize = (e, type) => {
-            let _Y = (type === "y");
-            // If the event is touchstart
-            let coords = _getXY(e);
-
-            let _PARENT = (_Y) ? terminal.parentElement.parentElement : document.querySelector('#terminal-fast-option');
-            // Resize terminal height
-            let _MAX = _Y ? window.innerHeight * 0.8 : window.innerWidth * 0.5;
-            let _MIN = _Y ? window.innerHeight * 0.2 : window.innerWidth * 0.1;
-            let _SIZE = _PARENT.getBoundingClientRect()[_Y ? "height" : "width"];
-            let _START = coords[type];
-            
-            const fncTouch = (e2) => {
-
-                // Remove if the event is passive
-                if(!['touchstart', 'touchmove', 'touchend', 'touchcancel'].includes(e.type)){
-                    e2.preventDefault();
-                }
-                
-                // If the event is touchstart
-                let coordsM = _getXY(e2);
-
-                document.body.classList.add(_Y ? 'row-resize' : 'col-resize');
-
-                let _NEW_SIZE = _SIZE - (coordsM[type] - _START); // - (e.clientY - _START); ---> Because the height grows from bottom to top
-
-                if(_NEW_SIZE > _MIN && _NEW_SIZE < _MAX)
-                    (_Y) 
-                    ?
-                        _PARENT.style.height = `${_NEW_SIZE}px`
-                    :
-                        (document.documentElement || document.querySelector(':root')).style.setProperty('--termOption', `${_NEW_SIZE}px`);
-            }
-            window.onmousemove = fncTouch;
-            window.ontouchmove = fncTouch;
-
-            window.onmouseup = () => _fncEndResize(type);
-            window.ontouchend = () => _fncEndResize(type);
-        };
-        // End resize
-        const _fncEndResize = (type) => {
-            let _Y = (type === "y");
-
-            document.body.classList.remove(_Y ? 'row-resize' : 'col-resize');
-
-            window.onmousemove = null;
-            window.ontouchmove = null;
-            window.onmouseup = null;
-            window.ontouchend = null;
-
-            // Save terminal height and option width
-
-            localStorage.setItem(
-                _Y ? 'terminalHeight' : 'terminalOptWidth',
-                _Y ? terminal.parentElement.parentElement.getBoundingClientRect().height : document.querySelector('#terminal-fast-option').getBoundingClientRect().width
-            );
-        };
         
         ['mousedown','touchstart'].forEach( evt => {
             document.querySelector('#scroll-height.terminal').addEventListener(evt, (e) => _fncStartResize(e, "y"));
@@ -786,7 +906,6 @@ window.addEventListener('load', () => {
         // Font size
         if (localStorage.getItem('fontSize')){
             let size = parseFloat(localStorage.getItem('fontSize'));
-            console.log(size);
             if(size >= 5 && size <= 35)
                 (document.documentElement || document.querySelector(':root')).style.setProperty('--font-size', `${size}px`);
         }
