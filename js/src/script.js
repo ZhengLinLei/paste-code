@@ -395,6 +395,37 @@ window.addEventListener('load', () => {
                     // Overload line numbers fnc
                     _set_lines(newWindow);
                 }
+
+                // Check autofill
+                const autoFillDict = {
+                    '(': ')',
+                    '{': '}',
+                    "'": "'",
+                    '"': '"',
+                    '[': ']',
+                    '<': ''
+                }
+
+                if (e.key in autoFillDict) {
+                    e.preventDefault();
+
+                    let content;
+                    let _l = codeWindow.classList[0].replace('language-', '').toUpperCase();
+                    // HTML and XML AutoFill
+                    if (_l == 'XML' || _l == 'HTML')
+                        content = '>';
+                    else
+                        content = autoFillDict[e.key];
+
+                    const start = newWindow.selectionStart;
+                    newWindow.value = newWindow.value.substring(0, start) + content + newWindow.value.substring(newWindow.selectionEnd);
+                    // fix caret position
+                    newWindow.selectionStart = newWindow.selectionEnd = start;
+
+                    // Update code
+                    _update_code(newWindow)
+                }
+
             });   // Update line numbers
 
             // Onfocusout
