@@ -299,19 +299,40 @@ window.addEventListener('load', () => {
                 // codeWindow.scrollLeft = newWindow.scrollLeft;
             });
             newWindow.addEventListener('keydown', (e) => {
-                // Write tab on tab press
-                if(e.key == 'Tab' || e.keyCode == 9 || e.which == 9) {
-                    e.preventDefault();
-
+                let autoFillFn = (content, offset) => {
                     const start = newWindow.selectionStart;
-                    newWindow.value = newWindow.value.substring(0, start) + " ".repeat(tabSize) + newWindow.value.substring(newWindow.selectionEnd);
+                    newWindow.value = newWindow.value.substring(0, start) + content + newWindow.value.substring(newWindow.selectionEnd);
                     // fix caret position
-                    newWindow.selectionStart = newWindow.selectionEnd = start + tabSize;
+                    newWindow.selectionStart = newWindow.selectionEnd = start + offset;
 
                     // Update code
                     _update_code(newWindow)
-
                 }
+                // Write tab on tab press
+                if(e.key == 'Tab' || e.keyCode == 9 || e.which == 9) {
+                    e.preventDefault();
+                    autoFillFn(" ".repeat(tabSize), tabSize);
+                }
+                // Autofill characters
+                let autoFillDict = {
+                    '(' : ')',
+                    '[' : ']',
+                    '{' : '}',
+                    '"' : '"',
+                    "'" : "'",
+                    '`' : '`',
+                }
+                if (e.key in autoFillDict) {
+                    autoFillFn(autoFillDict[e.key], 0);
+                }
+
+                let lang = codeWindow.classList[0].replace('language-', '').toUpperCase();
+
+                if ( e.key == '<' && (lang == 'HTML' || lang == 'XML')) {
+                    autoFillFn('>', 0);
+                }
+
+
                 // Update lines number if the user jump lines
                 if(e.key == 'ArrowUp' || e.keyCode == 38 || e.which == 38){
                     // Overload line numbers fnc
