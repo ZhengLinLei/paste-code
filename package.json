@@ -1,0 +1,16 @@
+{
+  "name": "paste-code",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "minify": "grunt uglify:js"
+  },
+  "keywords": [],
+  "author": "Zheng Lin Lei",
+  "license": "MIT",
+  "dependencies": {
+    "grunt": "^1.6.1",
+    "grunt-contrib-uglify": "^5.2.2"
+  }
+}

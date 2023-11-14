@@ -1,3 +1,0 @@
-XMLHttpRequest cannot load ./cfg/php.ini due to access control checks. - line 15372
-TypeError: undefined is not an object (evaluating 'lvl.replace') - 12108
-TypeError: undefined is not an object (evaluating 'variables_order.indexOf') - line 12143

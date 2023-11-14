@@ -8,3 +8,7 @@
 # Release
 /dist
 *.zip
+
+node_modules
+
+*.log
