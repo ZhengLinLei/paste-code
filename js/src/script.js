@@ -1000,8 +1000,13 @@ window.addEventListener('load', () => {
             _load_config();
         }
         let base64 = location.hash.substring(1);
-        if (base64.length == 0 || base64 == "undefined" || !('fetch' in window))
+        if (base64.length == 0 || base64 == "undefined" || !('fetch' in window)) {
+            if (!localStorage.getItem(ROOT.localStorage)) {
+                compile();
+                return;
+            }
             base64 = localStorage.getItem(ROOT.localStorage);
+        }
         
         // Decode base64 and run compile()
         await _get_url(base64, compile);
