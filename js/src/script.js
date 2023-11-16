@@ -81,6 +81,7 @@ window.addEventListener('load', () => {
     // ==== ROOT =========
     const ROOT = {
         url: document.location,
+        localStorage: 'paste-code'
     }
     const WINDOW_CONFIG = {
         parent: document.querySelector('.textarea'),
@@ -325,8 +326,8 @@ window.addEventListener('load', () => {
                 if (e.key in autoFillDict) {
                     autoFillFn(autoFillDict[e.key], 0);
                 }
-
-                let lang = codeWindow.classList[0].replace('language-', '').toUpperCase();
+                
+                let lang = (codeWindow.classList[0] ?? '').replace('language-', '').toUpperCase();
 
                 if ( e.key == '<' && (lang == 'HTML' || lang == 'XML')) {
                     autoFillFn('>', 0);
@@ -356,6 +357,17 @@ window.addEventListener('load', () => {
                     end += end == newWindow.value.length-1 ? 1 : 0;
 
                     newWindow.setSelectionRange(start, end);
+                }
+
+                // Save context
+                if (e.ctrlKey && e.key === 's') {
+                    // Prevent the Save dialog to open
+                    e.preventDefault();
+                    
+                    _generate_url('url', true, e => {
+                        // Save to localStorage
+                        localStorage.setItem(ROOT.localStorage, e);
+                    });
                 }
                 // // Move line up and the line above down
                 // if (e.altKey && e.key == 'ArrowUp' || e.altKey && e.keyCode == 38 || e.altKey && e.which == 38){
@@ -614,6 +626,71 @@ window.addEventListener('load', () => {
     };
 
     // ==== MAIN =========
+
+    const _generate_url = (type, r = false, callback) => {
+        // Get all windows
+        WINDOW_CONFIG.windows.forEach((window, index) => WINDOW_CONFIG.windows_value[index] = window.value);
+
+        // Compress
+        lzma.compress(JSON.stringify(WINDOW_CONFIG.windows_value), 1, (compressed, error) => {
+            if (error) {
+                alert("Failed to compress data: " + error);
+                return;
+            }
+            let reader = new FileReader();
+            reader.onload = function () {
+                let base64 = reader.result.substr(reader.result.indexOf(",") + 1);
+                // Only return
+                if (r) {
+                    callback(base64);
+                    return;
+                }
+
+                let url = "https://" + ROOT.url.host + ROOT.url.pathname + "#" + base64;
+                var result = (type === 'markdown') ? "[paste](" + url + ")" : url;
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(result);
+                document.querySelector('.nav-text-offer input').value = result;
+                document.querySelector("body > footer").classList.add("text-offer");
+            };
+            reader.readAsDataURL(new Blob([new Uint8Array(compressed)]));
+        });
+    }
+
+    const _get_url = async (base64, callback) => {
+        let r = await fetch("data:application/octet-stream;base64," + base64);
+        let blob = await r.blob();
+        let reader = new FileReader();
+        reader.onload = function () {
+            var compressed_data = Array.from(new Uint8Array(reader.result));
+            lzma.decompress(compressed_data, function (plaintext, error) {
+                if (error) {
+                    alert("Failed to decompress data: " + error);
+                }
+                // Write each window
+                try {
+                    const arrayData = JSON.parse(plaintext);
+                    // If it is a object
+                    if(typeof arrayData === 'object'){
+                        arrayData.forEach((el, i) => {
+                            addWindow();
+                            // Write data
+                            WINDOW_CONFIG.windows[i].value = el;
+
+                            // Update code
+                            _update_code(WINDOW_CONFIG.windows[i]);
+                        });
+                    }
+                } catch (error) {
+                    alert("Failed to writing data: " + error);
+                }
+
+                callback();
+            });
+        };
+        reader.readAsArrayBuffer(blob);
+    }
     // Global MAIN variables
     let _toggle_terminal;
     const __main__ = () => {
@@ -664,28 +741,8 @@ window.addEventListener('load', () => {
             btn.addEventListener('click', () => {
                 const btn_type = btn.getAttribute('data-type');
 
-                // Get all windows
-                WINDOW_CONFIG.windows.forEach((window, index) => WINDOW_CONFIG.windows_value[index] = window.value);
-
-                // Compress
-                lzma.compress(JSON.stringify(WINDOW_CONFIG.windows_value), 1, (compressed, error) => {
-                    if (error) {
-                        alert("Failed to compress data: " + error);
-                        return;
-                    }
-                    let reader = new FileReader();
-                    reader.onload = function () {
-                        let base64 = reader.result.substr(reader.result.indexOf(",") + 1);
-                        let url = "https://" + ROOT.url.host + ROOT.url.pathname + "#" + base64;
-                        var result = (btn_type === 'markdown') ? "[paste](" + url + ")" : url;
-
-                        // Copy to clipboard
-                        navigator.clipboard.writeText(result);
-                        document.querySelector('.nav-text-offer input').value = result;
-                        document.querySelector("body > footer").classList.add("text-offer");
-                    };
-                    reader.readAsDataURL(new Blob([new Uint8Array(compressed)]));
-                });
+                // Generate url
+                _generate_url(btn_type);
             });
         });
 
@@ -943,42 +1000,11 @@ window.addEventListener('load', () => {
             _load_config();
         }
         let base64 = location.hash.substring(1);
-        if (base64.length == 0 || base64 == "undefined" || !fetch){
-            compile();
-            return;
-        }
-        // Decode base64
-
-        let r = await fetch("data:application/octet-stream;base64," + base64);
-        let blob = await r.blob();
-        let reader = new FileReader();
-        reader.onload = function () {
-            var compressed_data = Array.from(new Uint8Array(reader.result));
-            lzma.decompress(compressed_data, function (plaintext, error) {
-                if (error) {
-                    alert("Failed to decompress data: " + error);
-                }
-                // Write each window
-                try {
-                    const arrayData = JSON.parse(plaintext);
-                    // If it is a object
-                    if(typeof arrayData === 'object'){
-                        arrayData.forEach((el, i) => {
-                            addWindow();
-                            // Write data
-                            WINDOW_CONFIG.windows[i].value = el;
-
-                            // Update code
-                            _update_code(WINDOW_CONFIG.windows[i]);
-                        });
-                    }
-                } catch (error) {
-                    alert("Failed to writing data: " + error);
-                }
-
-                compile();
-            });
-        };
-        reader.readAsArrayBuffer(blob);
+        if (base64.length == 0 || base64 == "undefined" || !('fetch' in window))
+            base64 = localStorage.getItem(ROOT.localStorage);
+        
+        // Decode base64 and run compile()
+        await _get_url(base64, compile);
+        
     }; fn();
 });
