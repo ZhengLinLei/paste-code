@@ -502,7 +502,6 @@ window.addEventListener('load', () => {
         if (WINDOW_CONFIG.current > WINDOW_CONFIG.min && WINDOW_CONFIG.visible > WINDOW_CONFIG.min) {
             // Remove last visible window
             do {
-                console.log(WINDOW_CONFIG.focus);
                 if (WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement.style.display != 'none')
                     break;
 
@@ -512,30 +511,47 @@ window.addEventListener('load', () => {
                 else
                     WINDOW_CONFIG.focus--;
             } while (true);
-            WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement);
-            // Remove from array resetting index
-            WINDOW_CONFIG.windows = WINDOW_CONFIG.windows.filter((win, index) => index != WINDOW_CONFIG.focus);
-            // Remove code window ISSUE #7 and #13 resetting index
-            WINDOW_CONFIG.codeWindow = WINDOW_CONFIG.codeWindow.filter((win, index) => index != WINDOW_CONFIG.focus);  // Remove code window ISSUE #7 and #13
 
-            WINDOW_CONFIG.current--;
-            WINDOW_CONFIG.visible--;
+            // Confirm delete window
+            let containerModal = document.querySelector('.container-modal');
+            containerModal.style.display = 'flex';
 
-            visibilityFullSpan();
+            let modalSpan = document.querySelector('.modal-text');
+            modalSpan.textContent = 'Remove window ' + WINDOW_CONFIG.focus + '?';
 
-            // Update class
-            //console.log(WINDOW_CONFIG.windows, WINDOW_CONFIG.codeWindow);   // ISSUE #13
-            WINDOW_CONFIG.windows.forEach((win, index) => {
-                // Remove all classlist
-                win.parentElement.classList.remove(...win.parentElement.classList);
-                win.parentElement.classList.add(`w-${index}`);
-            });
+            let confirmModal = document.getElementById('confirm-modal');
+            let closeModal = document.getElementById('cancel-modal');
 
-            return true;
+            // Click [yes] --> Close window
+            confirmModal.onclick = () => {
+                WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement);
+                // Remove from array resetting index
+                WINDOW_CONFIG.windows = WINDOW_CONFIG.windows.filter((win, index) => index != WINDOW_CONFIG.focus);
+                // Remove code window ISSUE #7 and #13 resetting index
+                WINDOW_CONFIG.codeWindow = WINDOW_CONFIG.codeWindow.filter((win, index) => index != WINDOW_CONFIG.focus);  // Remove code window ISSUE #7 and #13
+
+                WINDOW_CONFIG.current--;
+                WINDOW_CONFIG.visible--;
+
+                visibilityFullSpan();
+
+                // Update class
+                //console.log(WINDOW_CONFIG.windows, WINDOW_CONFIG.codeWindow);   // ISSUE #13
+                WINDOW_CONFIG.windows.forEach((win, index) => {
+                    // Remove all classlist
+                    win.parentElement.classList.remove(...win.parentElement.classList);
+                    win.parentElement.classList.add(`w-${index}`);
+                });
+                document.querySelector('.hidden-tab').classList.add('demo');
+                setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
+                containerModal.style.display = 'none';
+            }
+    
+            // CLick [no] --> Not close window
+            closeModal.onclick = () => {
+                containerModal.style.display = 'none';
+            }
         }
-
-        document.querySelector('.hidden-tab').classList.add('demo');
-        setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
     }
 
     // === Close text offer =====
