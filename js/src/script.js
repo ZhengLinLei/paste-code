@@ -512,18 +512,8 @@ window.addEventListener('load', () => {
                     WINDOW_CONFIG.focus--;
             } while (true);
 
-            // Confirm delete window
-            let containerModal = document.querySelector('.container-modal');
-            containerModal.style.display = 'flex';
-
-            let modalSpan = document.querySelector('.modal-text');
-            modalSpan.textContent = 'Remove window ' + WINDOW_CONFIG.focus + '?';
-
-            let confirmModal = document.getElementById('confirm-modal');
-            let closeModal = document.getElementById('cancel-modal');
-
-            // Click [yes] --> Close window
-            confirmModal.onclick = () => {
+            const removeOnce = () => {
+                // ---- Remove window
                 WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement);
                 // Remove from array resetting index
                 WINDOW_CONFIG.windows = WINDOW_CONFIG.windows.filter((win, index) => index != WINDOW_CONFIG.focus);
@@ -544,12 +534,23 @@ window.addEventListener('load', () => {
                 });
                 document.querySelector('.hidden-tab').classList.add('demo');
                 setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
-                containerModal.style.display = 'none';
             }
-    
-            // CLick [no] --> Not close window
-            closeModal.onclick = () => {
-                containerModal.style.display = 'none';
+
+            // Confirm delete window
+            document.querySelector('.modal-text').textContent = 'Are you sure you want to remove the window [' + WINDOW_CONFIG.focus + ']?';
+            // Cloning pre
+            document.querySelector('.container-modal .code').innerHTML = "";
+            document.querySelector('.container-modal .code').appendChild(WINDOW_CONFIG.codeWindow[WINDOW_CONFIG.focus].parentElement.cloneNode(true));
+            // Open modal
+            document.querySelector('.container-modal').classList.add('show');
+
+            // Click [yes] --> Close window
+            document.getElementById('confirm-modal').onclick = removeOnce;
+            window.onkeydown = (e) => {
+                if (e.key == 'Enter' || e.keyCode == 13 || e.code == 'Enter' || e.which == 13) {
+                    removeOnce();
+                    document.querySelector('.container-modal').classList.remove('show');
+                }
             }
         }
     }
@@ -579,7 +580,7 @@ window.addEventListener('load', () => {
         let coords = _getXY(e);
         let _PARENT, _MAX, _MIN;
         if (!other) {
-            _PARENT = (_Y) ? terminal.parentElement.parentElement : document.querySelector('#terminal-fast-option');
+            _PARENT = (_Y) ? document.querySelector('#terminal') : document.querySelector('#terminal-fast-option');
             // Resize terminal height
             _MAX = _Y ? window.innerHeight * 0.8 : window.innerWidth * 0.5;
             _MIN = _Y ? window.innerHeight * 0.2 : window.innerWidth * 0.1;
@@ -588,6 +589,7 @@ window.addEventListener('load', () => {
             _MAX = _Y ? window.innerHeight * 0.9 : window.innerWidth * 0.5;
             _MIN = _Y ? window.innerHeight * 0.1 : window.innerWidth * 0.1;
         }
+
         let _SIZE = _PARENT.getBoundingClientRect()[_Y ? "height" : "width"];
         let _START = coords[type];
             
@@ -601,6 +603,7 @@ window.addEventListener('load', () => {
             let coordsM = _getXY(e2);
 
             document.body.classList.add(_Y ? 'row-resize' : 'col-resize');
+            document.body.classList.add('no-select');
 
             let _NEW_SIZE = _SIZE - (coordsM[type] - _START); // - (e.clientY - _START); ---> Because the height grows from bottom to top
             
@@ -626,6 +629,7 @@ window.addEventListener('load', () => {
         let _Y = (type === "y");
 
         document.body.classList.remove(_Y ? 'row-resize' : 'col-resize');
+        document.body.classList.remove('no-select');
 
         window.onmousemove = null;
         window.ontouchmove = null;
@@ -774,6 +778,10 @@ window.addEventListener('load', () => {
             closeOffer()
         });
 
+        // === MODAL ALERT ===
+        const modalRemoveShow = () => document.querySelector('.container-modal').classList.remove('show');
+        document.querySelector('.container-modal .bg-event').addEventListener('click', modalRemoveShow);
+        ['confirm-modal', 'cancel-modal'].forEach(el => document.getElementById(el).addEventListener('click', modalRemoveShow));
 
         // ==== TERMINAL =========
         _toggle_terminal = (type="toggle") => {
