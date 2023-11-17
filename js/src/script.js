@@ -550,6 +550,7 @@ window.addEventListener('load', () => {
                 if (e.key == 'Enter' || e.keyCode == 13 || e.code == 'Enter' || e.which == 13) {
                     removeOnce();
                     document.querySelector('.container-modal').classList.remove('show');
+                    window.onkeydown = null;
                 }
             }
         }
@@ -779,7 +780,10 @@ window.addEventListener('load', () => {
         });
 
         // === MODAL ALERT ===
-        const modalRemoveShow = () => document.querySelector('.container-modal').classList.remove('show');
+        const modalRemoveShow = () => { 
+            document.querySelector('.container-modal').classList.remove('show'); 
+            window.onkeydown = null; 
+        }
         document.querySelector('.container-modal .bg-event').addEventListener('click', modalRemoveShow);
         ['confirm-modal', 'cancel-modal'].forEach(el => document.getElementById(el).addEventListener('click', modalRemoveShow));
 
