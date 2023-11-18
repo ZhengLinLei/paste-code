@@ -97,10 +97,10 @@ window.addEventListener('load', () => {
         lineActive: [],
     }
 
-    let alert = (content) => {
-        document.querySelector('.save-modal').classList.add('active');
-        document.querySelector('.save-modal-text').textContent = content;
-        setTimeout(function() {document.querySelector('.save-modal').classList.remove('active');}, 5000);
+    let alertModal = (content) => {
+        document.querySelector('.alert-modal').classList.add('active');
+        document.querySelector('.alert-modal-text').textContent = content;
+        setTimeout(function() {document.querySelector('.alert-modal').classList.remove('active');}, 5000);
     }
 
     // ==== GET LANG ============
@@ -373,10 +373,10 @@ window.addEventListener('load', () => {
                         try {
                             // Save to localStorage
                             localStorage.setItem(ROOT.localStorage, e);
-                            alert('Content saved successfully');
+                            alertModal('Content saved successfully');
                         }
                         catch (e) {
-                            alert('Error saving');
+                            alertModal('Error saving');
                         }
                     });
                 }

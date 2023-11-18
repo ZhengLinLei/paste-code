@@ -93,7 +93,7 @@ body{
                 color: #000;
             }
         }
-        .save-modal {
+        .alert-modal {
             background-color: rgba(#fff, 0.8);
             p {
                 color: #000000;
@@ -203,7 +203,7 @@ body{
                 color: #000;
             }
         }
-        .save-modal {
+        .alert-modal {
             background-color: rgba(#fff, 0.8);
             p {
                 color: #000000;
@@ -316,7 +316,7 @@ body{
                 color: #000;
             }
         }
-        .save-modal {
+        .alert-modal {
             background-color: rgba(#fff, 0.8);
             p {
                 color: #000000;
@@ -429,7 +429,7 @@ body{
                 color: #fff;
             }
         }
-        .save-modal {
+        .alert-modal {
             background-color: rgba(#000, 0.8);
             p {
                 color: #fff;
@@ -536,7 +536,7 @@ body{
                 color: #000;
             }
         }
-        .save-modal {
+        .alert-modal {
             background-color: rgba(rgb(255, 255, 255), 0.8);
             p {
                 color: #000;
@@ -895,7 +895,7 @@ body{
         }
     }
 
-    .save-modal {
+    .alert-modal {
         visibility: hidden;
         position: fixed;
         z-index: 100;
@@ -912,7 +912,7 @@ body{
         }
     }
  
-    .save-modal.active {
+    .alert-modal.active {
         transform: translate(-50%, 0%);
         visibility: visible;
         opacity: 1;
