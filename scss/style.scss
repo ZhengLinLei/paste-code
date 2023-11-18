@@ -93,6 +93,12 @@ body{
                 color: #000;
             }
         }
+        .alert-modal {
+            background-color: rgba(#fff, 0.8);
+            p {
+                color: #000000;
+            }
+        }
         .container-modal {
             .bg-event {
                 background-color: rgb(255, 255, 255, 0.3);
@@ -195,6 +201,12 @@ body{
             background-color: rgba(#fff, 1);
             a {
                 color: #000;
+            }
+        }
+        .alert-modal {
+            background-color: rgba(#fff, 0.8);
+            p {
+                color: #000000;
             }
         }
         .container-modal {
@@ -304,6 +316,12 @@ body{
                 color: #000;
             }
         }
+        .alert-modal {
+            background-color: rgba(#fff, 0.8);
+            p {
+                color: #000000;
+            }
+        }
         .container-modal {
             .bg-event {
                 background-color: rgb(0, 0, 0, 0.3);
@@ -411,6 +429,12 @@ body{
                 color: #fff;
             }
         }
+        .alert-modal {
+            background-color: rgba(#000, 0.8);
+            p {
+                color: #fff;
+            }
+        }
         .container-modal {
             .bg-event {
                 background-color: rgb(#000, 0.2);
@@ -509,6 +533,12 @@ body{
         > .hidden-tab {
             background-color: rgba(rgb(255, 255, 255), 1);
             a {
+                color: #000;
+            }
+        }
+        .alert-modal {
+            background-color: rgba(rgb(255, 255, 255), 0.8);
+            p {
                 color: #000;
             }
         }
@@ -865,6 +895,30 @@ body{
         }
     }
 
+    .alert-modal {
+        visibility: hidden;
+        position: fixed;
+        z-index: 100;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -100%);
+        opacity: 0;
+        transition: 0.2s;
+        background-color: rgba(#000, 0.8);
+        border-radius: 2px;
+        p {
+            color: #fff;
+            padding: 10px;
+        }
+    }
+ 
+    .alert-modal.active {
+        transform: translate(-50%, 0%);
+        visibility: visible;
+        opacity: 1;
+        transition: 0.2s;
+    }
+    
     .container-modal {
         display: none;
         position: fixed;
