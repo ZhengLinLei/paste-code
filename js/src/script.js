@@ -97,6 +97,12 @@ window.addEventListener('load', () => {
         lineActive: [],
     }
 
+    let alert = (content) => {
+        document.querySelector('.save-modal').classList.add('active');
+        document.querySelector('.save-modal-text').textContent = content;
+        setTimeout(function() {document.querySelector('.save-modal').classList.remove('active');}, 5000);
+    }
+
     // ==== GET LANG ============
     const _getLang = (window) => {
         // Get first line of code
@@ -363,10 +369,15 @@ window.addEventListener('load', () => {
                 if (e.ctrlKey && e.key === 's') {
                     // Prevent the Save dialog to open
                     e.preventDefault();
-                    
                     _generate_url('url', true, e => {
-                        // Save to localStorage
-                        localStorage.setItem(ROOT.localStorage, e);
+                        try {
+                            // Save to localStorage
+                            localStorage.setItem(ROOT.localStorage, e);
+                            alert('Content saved successfully');
+                        }
+                        catch (e) {
+                            alert('Error saving');
+                        }
                     });
                 }
                 // // Move line up and the line above down
