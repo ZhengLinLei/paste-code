@@ -64,6 +64,10 @@ let setTabSize = (size) => {
 let tabSize = 4, tabRegex = /\t/g;
 // Theme list
 const ThemeArr = ['light', 'dark', 'funky', 'twilight', 'solarized', 'night', 'zll'];
+let THEME_ = {
+    importTheme: null,
+    exportTheme: null,
+}
 
 let TMP_ID = 0;
 // Display Output
@@ -111,7 +115,7 @@ window.addEventListener('load', () => {
         if(firstLine.match(/[\!|\?]/)) {
             // Get language
             let arr = firstLine.split(/[\!|\?]/);
-            let tmpLang = arr[arr.length-1].toLowerCase(); // Fixed ISSUE #8
+            let tmpLang = arr[arr.length-1].toLowerCase().trim(); // Fixed ISSUE #8
 
             // Check if language is valid
             if(!tmpLang.includes('-->')) return tmpLang;

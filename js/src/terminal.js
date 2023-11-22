@@ -81,7 +81,7 @@ class Terminal{
             usage:
                 font set +3
 
-        - theme [set | get | reset | list] [:string]
+        - theme [set | get | reset | list | import | export] [:string]
             usage:
                 theme set dark
 
@@ -134,7 +134,7 @@ class Terminal{
         help: 0,
         config: ["set", "get", "reset"],
         font: ["set", "get", "reset"],
-        theme: ["set", "get", "reset", "list"],
+        theme: ["set", "get", "reset", "list", "import", "export"],
         run: 0,
         execute: 0,
         a: 0,
@@ -308,6 +308,12 @@ class Terminal{
                 case "list":
                     result = [1, `<div><span>Theme list: <span class="token comment">${this.#hash.theme.list.join(", ")}</span></span><p>See <a href="https://github.com/ZhengLinLei/paste-code/blob/main/THEME.md">https://github.com/ZhengLinLei/paste-code/blob/main/THEME.md</a> to customise themes.</div>`];
                     break;
+                case "export":
+                    // Code here
+                    break;
+                case "import":
+                    // Push input file
+                    result = [1, `<div><p>Upload theme file</p><br><input onchange="alertModal('Changing theme')" type="file" accept="*.json, application/JSON, application/json"/></div><br>`];
             }
 
             return result;
