@@ -910,13 +910,12 @@ body{
             color: #fff;
             padding: 10px;
         }
-    }
- 
-    .alert-modal.active {
-        transform: translate(-50%, 0%);
-        visibility: visible;
-        opacity: 1;
-        transition: 0.2s;
+        &.active {
+            transform: translate(-50%, 0%);
+            visibility: visible;
+            opacity: 1;
+            transition: 0.2s;
+        }
     }
     
     .container-modal {
@@ -942,6 +941,7 @@ body{
         .prompt-modal {
             background-color: #fff;
             min-width: 320px;
+            max-width: 500px;
             .modal-text {
                 padding: 10px;
             }

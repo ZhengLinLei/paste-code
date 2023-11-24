@@ -85,9 +85,12 @@ class Terminal{
             usage:
                 theme set dark
 
-        - run [:int (windows: 0-3, default: 0)] [list]
+        - run [:int (windows: 0-3, default: 0)]
             usage:
                 run 1
+
+        - run [list | set-url | unset-url]
+            By default the auto-execution is going to execute window 0
 
         - execute [:int (windows: 0-3, default: 0)]
             usage:
@@ -226,7 +229,8 @@ class Terminal{
                         terminalHeight: localStorage.getItem("terminalHeight") || "default",
                         terminalOptWidth: localStorage.getItem("terminalOptWidth") || "default",
                         fontSize: localStorage.getItem("fontSize") || "default",
-                        theme: localStorage.getItem("theme") || "default",                        
+                        theme: localStorage.getItem("theme") || "default",
+                        autoExecuteFlag: localStorage.getItem(this.#hash.root.localStorage.autoExecuteFlag) || "false"                    
                     }
 
                     result = [1, 
@@ -315,8 +319,23 @@ class Terminal{
         "run": (opt) => {
 
             // Return list
-            if (opt.length >= 2 && opt[1] == "list")
-                return [1, `<div><span>Executer supported languages: <span class="token comment">${Object.keys(this.executer).join(', ')}</span></span></div><br>`];
+            if (opt.length >= 2) {
+                if (opt[1] == "list") {
+                    return [1, `<div><span>Executer supported languages: <span class="token comment">${Object.keys(this.executer).join(', ')}</span></span></div><br>`];
+                }
+
+                if (opt[1] == "set-url") {
+                    // Set true to localStorage
+                    localStorage.setItem(this.#hash.root.localStorage.autoExecuteFlag, "true");
+                    return [1, `<div><span>Auto execution flag <span class="token comment">enabled</span></span></div><br>`];
+                }
+
+                if (opt[1] == "unset-url") {
+                    // Set true to localStorage
+                    localStorage.removeItem(this.#hash.root.localStorage.autoExecuteFlag);
+                    return [1, `<div><span>Auto execution flag <span class="token comment">disabled</span></span></div><br>`];
+                }
+            }
 
 
             let result = [0, `
