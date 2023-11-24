@@ -81,7 +81,7 @@ window.addEventListener('load', () => {
     // ==== ROOT =========
     const ROOT = {
         url: document.location,
-        base64: undefined,
+        base64: 'undefined',
         _get: {},
         localStorage: {
             fileMemory: 'paste-code',
@@ -1087,7 +1087,7 @@ window.addEventListener('load', () => {
                 compile();
                 return;
             }
-            base64 = localStorage.getItem(ROOT.localStorage.fileMemory);
+            ROOT.base64 = localStorage.getItem(ROOT.localStorage.fileMemory);
         }
         
         // Decode base64 and run compile()
