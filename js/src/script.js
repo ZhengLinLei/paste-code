@@ -1072,7 +1072,7 @@ window.addEventListener('load', () => {
     fn = async () => {
         const compile = () => {
             // get GET Parameters
-            _get.split('&').forEach(el => {
+            (_get ?? '').split('&').forEach(el => {
                 let x = el.split('=');
                 ROOT._get[x[0]] = x[1];
             });
