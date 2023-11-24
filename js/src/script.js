@@ -81,7 +81,12 @@ window.addEventListener('load', () => {
     // ==== ROOT =========
     const ROOT = {
         url: document.location,
-        localStorage: 'paste-code'
+        base64: 'undefined',
+        _get: {},
+        localStorage: {
+            fileMemory: 'paste-code',
+            autoExecuteFlag: 'paste-code-auto-execute'
+        }
     }
     const WINDOW_CONFIG = {
         parent: document.querySelector('.textarea'),
@@ -372,7 +377,7 @@ window.addEventListener('load', () => {
                     _generate_url('url', true, e => {
                         try {
                             // Save to localStorage
-                            localStorage.setItem(ROOT.localStorage, e);
+                            localStorage.setItem(ROOT.localStorage.fileMemory, e);
                             alertModal('Content saved successfully');
                         }
                         catch (e) {
@@ -680,6 +685,11 @@ window.addEventListener('load', () => {
 
                 let url = "https://" + ROOT.url.host + ROOT.url.pathname + "#" + base64;
                 var result = (type === 'markdown') ? "[paste](" + url + ")" : url;
+                
+                // If auto execution flag is enabled add it to url
+                if (localStorage.getItem(ROOT.localStorage.autoExecuteFlag) == 'true') {
+                    result += "?execute=true";
+                }
 
                 // Copy to clipboard
                 navigator.clipboard.writeText(result);
@@ -819,7 +829,7 @@ window.addEventListener('load', () => {
             
         }
 
-        const _ExecPush = () => {
+        const _ExecPush = (custom = null) => {
             // History pos reset
             TERMINAL_CONFIG.historyPosition = 0;
 
@@ -833,7 +843,7 @@ window.addEventListener('load', () => {
             _input.removeChild(_input.querySelector('button'));
 
 
-            _TERMINAL.exec(terminalInput.innerText)
+            _TERMINAL.exec(custom ?? terminalInput.innerText)
             .then((res) => {
                 // Clear input
                 TERMINAL_CONFIG.position = 0;
@@ -982,9 +992,37 @@ window.addEventListener('load', () => {
                 theme: {
                     list: ThemeArr,
                     set: _setTheme,
-                }
+                },
+                root: ROOT,
             }
         );
+
+        // Get GET parameters
+        if ("execute" in ROOT._get && ROOT._get.execute == "true") {
+            // Confirm execute
+            document.querySelector('.modal-text').innerHTML = 'The auto-execute is <b>enabled</b>. This action could be dangerous.<br><br>Do you want to execute it?';
+            // Cloning pre
+            document.querySelector('.container-modal .code').innerHTML = "";
+            document.querySelector('.container-modal .code').appendChild(WINDOW_CONFIG.codeWindow[0].parentElement.cloneNode(true));
+            // Open modal
+            document.querySelector('.container-modal').classList.add('show');
+
+            let executeCode = () => {
+                _toggle_terminal("open");
+
+                // Execute "run 0"
+                _ExecPush('run 0');
+            }
+            // Click [yes] --> Execute
+            document.getElementById('confirm-modal').onclick = executeCode;
+            window.onkeydown = (e) => {
+                if (e.key == 'Enter' || e.keyCode == 13 || e.code == 'Enter' || e.which == 13) {
+                    executeCode();
+                    document.querySelector('.container-modal').classList.remove('show');
+                    window.onkeydown = null;
+                }
+            }
+        }
     };
     // ==== LOAD CONFIGURATION =========
     const _load_config = () => {
@@ -1033,22 +1071,27 @@ window.addEventListener('load', () => {
     // ==== INIT =========
     fn = async () => {
         const compile = () => {
+            // get GET Parameters
+            (_get ?? '').split('&').forEach(el => {
+                let x = el.split('=');
+                ROOT._get[x[0]] = x[1];
+            });
             // RUN MAIN
             __main__();
             // ==== LOAD CONFIGURATION =========
             _load_config();
         }
-        let base64 = location.hash.substring(1);
-        if (base64.length == 0 || base64 == "undefined" || !('fetch' in window)) {
-            if (!localStorage.getItem(ROOT.localStorage)) {
+        let _get; [ROOT.base64, _get] = location.hash.substring(1).split('?');
+        if (ROOT.base64.length == 0 || ROOT.base64 == "undefined" || !('fetch' in window)) {
+            if (!localStorage.getItem(ROOT.localStorage.fileMemory)) {
                 compile();
                 return;
             }
-            base64 = localStorage.getItem(ROOT.localStorage);
+            ROOT.base64 = localStorage.getItem(ROOT.localStorage.fileMemory);
         }
         
         // Decode base64 and run compile()
-        await _get_url(base64, compile);
+        await _get_url(ROOT.base64, compile);
         
     }; fn();
 });

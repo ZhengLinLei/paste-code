@@ -17,6 +17,7 @@ Try it! [https://zhenglinlei.github.io/paste-code/](https://zhenglinlei.github.i
 * [Execute code in terminal](#execute-code-in-terminal)
 
 ### Updates
+* `2023 - 11 - 24` Auto execute your code shared by enabling it in terminal with command `run set-url` and disable it with `run unset-url`
 
 * `2023 - 11 - 13` Stash the windows for better view, simple and clean interface. Double click the window and you will see the effect
 
