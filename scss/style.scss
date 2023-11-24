@@ -875,15 +875,18 @@ body{
     }
 
     .hidden-tab {
+        &.terminal-opened {
+            bottom: calc(var(--footer-height) + var(--termSize) + 10px);
+        }  
         position: fixed;
         z-index: 99;
         right: 0;
-        transform: translateX(calc(100% - 10px));
-        transition: .5s;
+        transform: translateX(calc(100% - 15px));
+        transition: .2s;
         bottom: calc(var(--footer-height) + 10px);
         background-color: rgba(rgb(0, 0, 0), 1);
         border-radius: 5px 0 0 5px;
-        padding-left: 10px;
+        padding-left: 15px;
         cursor: pointer;
 
         &:hover, &.demo {
@@ -921,7 +924,7 @@ body{
     .container-modal {
         display: none;
         position: fixed;
-        z-index: 100;
+        z-index: 101;
         top: 0;
         left: 0;
         height: 100vh;

@@ -627,7 +627,7 @@ window.addEventListener('load', () => {
             if(_NEW_SIZE > _MIN && _NEW_SIZE < _MAX)
                 (_Y) 
                 ?
-                    _PARENT.style.height = `${_NEW_SIZE}px`    
+                    (document.documentElement || document.querySelector(':root')).style.setProperty('--termSize', `${_NEW_SIZE}px`) 
                 :
                     (!other)
                     ?
@@ -814,13 +814,22 @@ window.addEventListener('load', () => {
                 case "open":
                     document.querySelector('#terminal').classList.add('open');
                     terminal.focus();
+
+                    // Hidden tab
+                    document.querySelector('.hidden-tab').classList.add('terminal-opened');
                     break;
                 case "close":
                     document.querySelector('#terminal').classList.remove('open');
+
+                    // Hidden tab
+                    document.querySelector('.hidden-tab').classList.remove('terminal-opened');
                     break;
                 case "toggle":
                     document.querySelector('#terminal').classList.toggle('open');
                     terminal.focus();
+
+                    // Hidden tab
+                    document.querySelector('.hidden-tab').classList.toggle('terminal-opened');
                     break;
             }
 
