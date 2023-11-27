@@ -17,6 +17,7 @@
 
 
     // === ALL THEME VARIABLE ===
+    --theme-bg-color: #000;
     --theme-primary-color: #fff;
     --theme-secondary-color: rgb(240, 240, 240);
     --theme-color-muted: #506882;
@@ -76,10 +77,10 @@ body{
         cursor: pointer;
         &:hover{
             background: #666666;
-            color: #fff;
+            color: #fff !important;
         }
     }
-    background-color: var(--theme-text-color);
+    background-color: var(--theme-bg-color);
     color: var(--theme-text-color);
     width: 100vw;
     height: 100vh;
@@ -96,12 +97,13 @@ body{
     }
 
     &.dark{
+        --theme-bg-color: #fff;
         --theme-primary-color: #000;
         --theme-secondary-color: rgb(50, 50, 50);
         --theme-color-muted: #c9c9c9;
         --theme-text-color: #fff;
-        --theme-extra-color: #fff;
-        --theme-border-color: #fff;
+        --theme-extra-color: #000;
+        --theme-border-color: rgba(255, 255, 255, 0.5);
         --theme-caret-color: #fff;
         --theme-alert-color: rgba(255, 255, 255, 0.8);
         --theme-cristal-color: rgba(255, 255, 255, 0.3);
@@ -109,11 +111,12 @@ body{
     }
 
     &.funky{
+        --theme-bg-color: #fff;
         --theme-primary-color: #10142f;
         --theme-secondary-color: #121e69;
         --theme-color-muted: #c9c9c9;
         --theme-text-color: #fff;
-        --theme-extra-color: #fff;
+        --theme-extra-color: #000;
         --theme-border-color: #fff;
         --theme-caret-color: #ff0;
         --theme-alert-color: rgba(255, 255, 255, 1);
@@ -122,325 +125,53 @@ body{
     }
 
     &.twilight{
-        a{
-            &:hover{
-                background: #999999;
-            }
-        }
-        background-color: rgb(51, 51, 51);
-        color: #ffffff;
-        > footer{
-            background-color: rgba(#fff, 0.8);
-            color: #000000;
-            input{
-                border: 1px solid #000 !important;
-            }
-        }
-        > .hidden-tab {
-            background-color: rgba(#fff, 1);
-            a {
-                color: #000;
-            }
-        }
-        .alert-modal {
-            background-color: rgba(#fff, 0.8);
-            p {
-                color: #000000;
-            }
-        }
-        .container-modal {
-            .bg-event {
-                background-color: rgb(0, 0, 0, 0.3);
-            }
-            .prompt-modal {
-                background-color: #2c2c2c;
-                .code {
-                    &::after {
-                        background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
-                    }
-                    pre {
-                        background-color: #1f1f1f;
-                        margin-bottom: 0 !important;
-                    }
-                }
-                .option-modal {
-                    background-color: #fff;
-                    a {
-                        color: #000;
-                    }
-                }
-            }
-        }
-        > main {
-            div.textarea{
-                > div{
-                    background-color: #1f1f1f;
-                    .line-numbers-rows{
-                        border-right: .5px solid rgba(rgb(51, 51, 51), 0.3);
-                        background-color: #2c2c2c;
-                        > span{
-                            &:before{
-                                color: #e7e7e7;
-                            }
-                            &.current:before{
-                                background-color: #dd4a68;
-                                color: #fff;
-                            }
-                        }
-                    }
-                    textarea{
-                        caret-color: #dd4a68;
-                    }
-                    pre{
-                        code{
-                            color: #ffffff;
-                        }
-                    }
-                    textarea, pre, code, .line-numbers-rows{
-                        line-height: var(--lineS) !important;
-                    }
-                }
-            }
-            div#terminal{
-                background-color: #1f1f1f;
-                border-top: 2px solid #fff;
-                > header{
-                    background-color: #2c2c2c;
-                    border-bottom: .5px solid rgba(rgb(51, 51, 51), 0.3);
-                    color: #ffffff;
-                    a{
-                        &:hover{
-                            background: #fff;
-                            color: #000;
-                        }
-                    }
-                }
-                > main{
-                    > #terminal-fast-option{
-                        border-left: .5px solid rgba(rgb(51, 51, 51), 0.3);
-                        background-color: #2c2c2c;
-                    }
-                    > #terminal-main{
-                        #terminal-main-input{
-                            #terminal-caret{
-                                border: 1px solid #dd4a68;
-                                &.blink{
-                                    background-color: #dd4a68;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        --theme-bg-color: #fff;
+        --theme-primary-color: #1f1f1f;
+        --theme-secondary-color: #2c2c2c;
+        --theme-color-muted: #e7e7e7;
+        --theme-text-color: #fff;
+        --theme-extra-color: #000;
+        --theme-border-color: rgba(200, 200, 200, 0.3);
+        --theme-caret-color:  #dd4a68;
+        --theme-alert-color: rgba(255, 255, 255, 1);
+        --theme-cristal-color: rgba(255, 255, 255, 0.3);
+        --theme-footer-color: rgba(255, 255, 255, 0.8); 
     }
     &.solarized{
-        a{
-            &:hover{
-                background: #999999;
-            }
-        }
-        background-color: #fffdd6;
-        color: #000;
-        > footer{
-            background-color: rgba(#000, 0.8);
-            color: #fff;
-            input{
-                border: 1px solid #000 !important;
-            }
-        }
-        > .hidden-tab {
-            background-color: rgba(#000, 1);
-            a {
-                color: #fff;
-            }
-        }
-        .alert-modal {
-            background-color: rgba(#000, 0.8);
-            p {
-                color: #fff;
-            }
-        }
-        .container-modal {
-            .bg-event {
-                background-color: rgb(#000, 0.2);
-            }
-            .prompt-modal {
-                background-color: #fffa9a;
-                .code {
-                    &::after {
-                        background: linear-gradient(rgba(0, 0, 0, 0), rgba(#fffa9a, 0.85));
-                    }
-                    pre {
-                        background-color: #fffdd6;
-                    }
-                }
-                .option-modal {
-                    background-color: #000;
-                    a {
-                        color: #fff;
-                    }
-                }
-            }
-        }
-        > main {
-            div.textarea{
-                > div{
-                    background-color: #fffdd6;
-                    .line-numbers-rows{
-                        border-right: .5px solid rgba(#fff, 0.3);
-                        background-color: #fffa9a;
-                        > span{
-                            &:before{
-                                color: #000;
-                            }
-                            &.current:before{
-                                background-color: #2aa198;
-                                color: #fff;
-                            }
-                        }
-                    }
-                    textarea{
-                        caret-color: #2aa198;
-                    }
-                    textarea, pre, code, .line-numbers-rows{
-                        line-height: var(--lineS) !important;
-                    }
-                }
-            }
-            div#terminal{
-                background-color: #fffdd6;
-                border-top: 2px solid #fff;
-                > header{
-                    background-color: #fffa9a;
-                    border-bottom: .5px solid rgba(#fff, 0.3);
-                    color: #000;
-                    a{
-                        &:hover{
-                            background: #fff;
-                            color: #000;
-                        }
-                    }
-                }
-                > main{
-                    > #terminal-fast-option{
-                        border-left: .5px solid rgba(#fff, 0.3);
-                        background-color: #fffa9a;
-                    }
-                    > #terminal-main{
-                        #terminal-main-input{
-                            #terminal-caret{
-                                border: 1px solid #2aa198;
-                                &.blink{
-                                    background-color: #2aa198;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        --theme-bg-color: rgba(203, 75, 22, 0.3);
+        --theme-primary-color: #fffdd6;
+        --theme-secondary-color: #fffa9a;
+        --theme-color-muted: #000;
+        --theme-text-color: #000;
+        --theme-extra-color: #fff;
+        --theme-border-color: rgba(203, 75, 22, 0.3);
+        --theme-caret-color:  #2aa198;
+        --theme-alert-color: rgba(0, 0, 0, 1);
+        --theme-cristal-color: rgba(0, 0, 0, 0.3);
+        --theme-footer-color: rgba(0, 0, 0, 1); 
     }
-    &.night, &.zll{
-        a{
-            &:hover{
-                background: #999999;
-            }
-        }
-        background-color: #000000;
-        color: #fff;
-        > footer{
-            background-color: rgba(rgb(255, 255, 255), 0.8);
-            color: #000;
-            input{
-                border: 1px solid #000 !important;
-            }
-        }
-        > .hidden-tab {
-            background-color: rgba(rgb(255, 255, 255), 1);
-            a {
-                color: #000;
-            }
-        }
-        .alert-modal {
-            background-color: rgba(rgb(255, 255, 255), 0.8);
-            p {
-                color: #000;
-            }
-        }
-        .container-modal {
-            .bg-event {
-                background-color: rgb(#fff, 0.3);
-            }
-            .prompt-modal {
-                background-color: #17191c;
-                .code {
-                    &::after {
-                        background: linear-gradient(rgba(0, 0, 0, 0), rgba(#17191c, 0.85));
-                    }
-                    pre {
-                        background-color: #272b31;
-                    }
-                }
-                .option-modal {
-                    background-color: rgba($color: #fff, $alpha: 0.8);
-                    a {
-                        color: #000;
-                    }
-                }
-            }
-        }
+    &.night, &.zll {
+        --theme-bg-color: #000;
+        --theme-primary-color: #272b31; //#17191c;
+        --theme-secondary-color: #17191c;
+        --theme-color-muted:  rgb(120, 120, 120);
+        --theme-text-color: #fff;
+        --theme-extra-color: #000;
+        --theme-border-color: rgba(255, 255, 255, 0.4);
+        --theme-alert-color: rgba(255, 255, 255, 1);
+        --theme-cristal-color: rgba(255, 255, 255, 0.3);
+        --theme-footer-color: rgba(255, 255, 255, 1); 
+        --theme-caret-color:  #433695;
+    }
+
+    &.twilight, &.night, &.zll {
         > main {
             div.textarea{
                 > div{
-                    background-color: #272b31;
                     .line-numbers-rows{
-                        border-right: .5px solid rgba(#fff, 0.3);
-                        background-color: #17191c;
                         > span{
-                            &:before{
-                                color: rgb(120, 120, 120);
-                            }
                             &.current:before{
-                                background-color: #433695;
                                 color: #fff;
-                            }
-                        }
-                    }
-                    textarea{
-                        caret-color: #fff;
-                    }
-                    textarea, pre, code, .line-numbers-rows{
-                        line-height: var(--lineS) !important;
-                    }
-                }
-            }
-            div#terminal{
-                background-color: #272b31;
-                border-top: 2px solid #fff;
-                > header{
-                    background-color: #17191c;
-                    border-bottom: .5px solid rgba(#fff, 0.3);
-                    color: #fff;
-                    a{
-                        &:hover{
-                            background: #fff;
-                            color: #000;
-                        }
-                    }
-                }
-                > main{
-                    > #terminal-fast-option{
-                        border-left: .5px solid rgba(#fff, 0.3);
-                        background-color: #17191c;
-                    }
-                    > #terminal-main{
-                        #terminal-main-input{
-                            #terminal-caret{
-                                border: 1px solid #433695;
-                                &.blink{
-                                    background-color: #433695;
-                                }
                             }
                         }
                     }
@@ -595,7 +326,7 @@ body{
             // flex: 1;
             display: none;
             height: var(--termSize);
-            border-top: 2px solid var(--theme-text-color);
+            border-top: 2px solid var(--theme-border-color);
             background-color: var(--theme-primary-color);
             position: relative;
             scroll-behavior: smooth;
@@ -615,7 +346,7 @@ body{
 
                     &:hover{
                         background: var(--theme-text-color);
-                        color: var(--theme-primary-color);
+                        color: var(--theme-primary-color) !important;
                     }
                     &.close-terminal{
                         padding: 5px 10px;
@@ -692,7 +423,7 @@ body{
                         width: 100%;
                         &:hover{
                             background: var(--theme-text-color);
-                            color: var(--theme-primary-color);
+                            color: var(--theme-primary-color) !important;
                         }
                     }
                 }
@@ -720,7 +451,7 @@ body{
         }
         a {
             padding: 15px;
-            color: var(--theme-primary-color);
+            color: var(--theme-extra-color);
             &:hover {
                 color: var(--theme-primary-color);
             }
@@ -739,7 +470,7 @@ body{
         background-color: var(--theme-alert-color);
         border-radius: 2px;
         p {
-            color: var(--theme-primary-color);
+            color: var(--theme-extra-color);
             padding: 10px;
         }
         &.active {
@@ -806,9 +537,9 @@ body{
                 justify-content: end;
                 background-color: var(--theme-text-color);
                 a {
-                    color: var(--theme-primary-color);
+                    color: var(--theme-extra-color);
                     cursor: pointer;
-                    margin-right: 5px;
+                    margin-left: 5px;
                 }
             }
         }
@@ -816,7 +547,7 @@ body{
     // Footer styles
     > footer{
         background-color: var(--theme-footer-color);
-        color: var(--theme-primary-color);
+        color: var(--theme-extra-color);
         width: 100vw;
         position: fixed;
         z-index: 99;
