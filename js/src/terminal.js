@@ -130,6 +130,7 @@ class Terminal{
     }
 
     commands = {
+        "": 0,
         window: ["add", "remove"],
         terminal: ["close", "open"],
         cls: 0,
@@ -164,6 +165,7 @@ class Terminal{
 
     // terminal
     execution = {
+        "": () => [1, ""],
         "terminal": (opt) => {
             this.#hash.terminal.toggleFnc(opt[1]);
 
