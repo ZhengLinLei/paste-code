@@ -94,8 +94,7 @@ let THEME_ = {
                 out = "Error: Cannot parse JSON";
             }
 
-            console.log("aaa");
-            // Write outpur
+            // Write output
             let _output = document.createElement('div');
             _output.classList.add('terminal-output');
             _output.innerHTML = out;
