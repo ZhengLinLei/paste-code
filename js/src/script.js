@@ -64,11 +64,115 @@ let setTabSize = (size) => {
 let tabSize = 4, tabRegex = /\t/g;
 // Theme list
 const ThemeArr = ['light', 'dark', 'funky', 'twilight', 'solarized', 'night', 'zll'];
+let THEME_ = {
+    importTheme: (el) => {
+        // Get el fileContent
+        var reader = new FileReader();
+        const terminalOutput = document.querySelector('#terminal-main-history');
+        reader.readAsText(el.files[0], "UTF-8");
+        reader.onload = e => {
+            // Read content
+            let content = e.target.result, out = '';
+            // Parse JSON
+            try {
+                content = JSON.parse(content);
+
+                // Set class
+                document.body.removeAttribute('class');
+                document.body.classList.add(content.class);
+                localStorage.setItem('theme', content.class);
+                delete content.class;
+
+                // Add every property to css
+                for (let i in content) {
+                    document.body.style.setProperty(i, content[i]);
+                }
+
+                // Save to local storage
+                localStorage.setItem('customTheme', JSON.stringify(content));
+            } catch (error) {
+                out = "Error: Cannot parse JSON";
+            }
+
+            // Write output
+            let _output = document.createElement('div');
+            _output.classList.add('terminal-output');
+            _output.innerHTML = out;
+            terminalOutput.appendChild(_output);
+
+            // Scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+        reader.onerror = () => {
+            // Write outpur
+            let _output = document.createElement('div');
+            _output.classList.add('terminal-output');
+            _output.innerHTML = "Error: Cannot read file content";
+            terminalOutput.appendChild(_output);
+
+            // Scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    },
+    exportTheme: () => {
+        // --theme-bg-color: #000;
+        // --theme-primary-color: #fff;
+        // --theme-secondary-color: rgb(240, 240, 240);
+        // --theme-color-muted: #506882;
+        // --theme-text-color: #000000;
+        // --theme-extra-color: #fff;
+        // --theme-border-color: rgba(0, 0, 0, 0.3);
+        // --theme-caret-color: #000000;
+        // --theme-alert-color: rgba(0, 0, 0, 0.8);
+        // --theme-cristal-color: rgba(0, 0, 0, 0.3);
+        // --theme-footer-color: rgba(0, 0, 0, 0.8);
+        let cssVar = {
+            "--theme-bg-color": "",
+            "--theme-primary-color": "",
+            "--theme-secondary-color": "",
+            "--theme-color-muted": "",
+            "--theme-text-color": "",
+            "--theme-extra-color": "",
+            "--theme-border-color": "",
+            "--theme-caret-color": "",
+            "--theme-alert-color": "",
+            "--theme-cristal-color": "",
+            "--theme-footer-color": "",
+        }
+
+        // Get all css variables and convert json
+        for (let i in cssVar) {
+            cssVar[i] = document.body.style.getPropertyValue(i);
+        }
+
+        // Class
+        cssVar.class = document.body.classList[0];
+
+        // Write output and download file
+        saveToFile('PasteCodeTheme.json', JSON.stringify(cssVar));
+    },
+}
 
 let TMP_ID = 0;
 // Display Output
 function Out(str){
     document.querySelector('#'+TMP_ID).innerHTML += str + "<br>";
+}
+
+// Save to file
+function saveToFile(filename, content){
+    if ("saveAs" in window) {
+        var blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, filename);
+    } else {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
 }
 
 // ==============================================================
@@ -116,7 +220,7 @@ window.addEventListener('load', () => {
         if(firstLine.match(/[\!|\?]/)) {
             // Get language
             let arr = firstLine.split(/[\!|\?]/);
-            let tmpLang = arr[arr.length-1].toLowerCase(); // Fixed ISSUE #8
+            let tmpLang = arr[arr.length-1].toLowerCase().trim(); // Fixed ISSUE #8
 
             // Check if language is valid
             if(!tmpLang.includes('-->')) return tmpLang;
@@ -755,6 +859,9 @@ window.addEventListener('load', () => {
 
             // Save to local storage
             localStorage.setItem('theme', theme);
+
+            // Remove custom theme
+            // localStorage.removeItem('customTheme');
         }
         // Invert color
         const invert = document.querySelector('.invert-color');
@@ -1035,10 +1142,19 @@ window.addEventListener('load', () => {
     };
     // ==== LOAD CONFIGURATION =========
     const _load_config = () => {
-        // ==== DARK MODE =========
+        // ==== DEFAULT THEME =========
         // Check if dark mode is enabled
         if (localStorage.getItem('theme')) {
             document.body.classList.add(localStorage.getItem('theme'));
+        }
+
+        // Add custom theme if exists
+        if (localStorage.getItem('customTheme')) {
+            let parse = JSON.parse(localStorage.getItem('customTheme'));
+            // Add every property to css
+            for (let i in parse) {
+                document.body.style.setProperty(i, parse[i]);
+            }
         }
 
         // Check terminal position

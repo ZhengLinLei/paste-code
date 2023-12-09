@@ -81,7 +81,7 @@ class Terminal{
             usage:
                 font set +3
 
-        - theme [set | get | reset | list] [:string]
+        - theme [set | get | reset | list | import | export] [:string]
             usage:
                 theme set dark
 
@@ -138,7 +138,7 @@ class Terminal{
         help: 0,
         config: ["set", "get", "reset"],
         font: ["set", "get", "reset"],
-        theme: ["set", "get", "reset", "list"],
+        theme: ["set", "get", "reset", "list", "import", "export"],
         run: 0,
         execute: 0,
         a: 0,
@@ -309,10 +309,29 @@ class Terminal{
 
                 case "reset":
                     this.#hash.theme.set("light");
+                    localStorage.removeItem('customTheme');
+                    result = [1,
+                        `
+                        <br>
+                        <div>
+                            <span>Reload required <a href="javascript:location.reload()">[yes]</a><a>[no]</a></span>
+                        </div>
+                        <br>
+                        `
+                    ];
                     break;
 
                 case "list":
                     result = [1, `<div><span>Theme list: <span class="token comment">${this.#hash.theme.list.join(", ")}</span></span><p>See <a href="https://github.com/ZhengLinLei/paste-code/blob/main/THEME.md">https://github.com/ZhengLinLei/paste-code/blob/main/THEME.md</a> to customise themes.</div>`];
+                    break;
+                case "export":
+                    // Export theme
+                    THEME_.exportTheme();
+                    result = [1, ''];
+                    break;
+                case "import":
+                    // Push input file
+                    result = [1, `<div><p>Upload theme file</p><br><input onchange="THEME_.importTheme(this)" type="file" accept="*.json, application/JSON, application/json"/></div><br>`];
                     break;
             }
 
