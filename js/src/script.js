@@ -344,35 +344,49 @@ window.addEventListener('load', () => {
                 WINDOW_CONFIG.focus = index;
             });
 
-            windowParent.addEventListener('dblclick', () => {
-                // Get focus and close window
-                if (WINDOW_CONFIG.visible > 1) {
-                    document.querySelector('.hidden-tab').classList.add('demo');
-                    setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
-                    windowParent.style.display = 'none';
-                    WINDOW_CONFIG.visible--;
+            var timer,          // timer required to reset
+                timeout = 400;  // timer reset in ms
 
-                    // Odd
-                    visibilityFullSpan();
+            window.addEventListener("dblclick", function (evt) {
+                timer = setTimeout(function () {
+                    timer = null;
+                }, timeout);
+            });
+            window.addEventListener("click", function (evt) {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
 
-                    let a = document.createElement('a');
-                    a.onclick = (e) => {
-                        windowParent.style.display = 'block';
-                        a.remove();
+                    // Triple click
+                    // Get focus and close window
+                    if (WINDOW_CONFIG.visible > 1) {
+                        document.querySelector('.hidden-tab').classList.add('demo');
+                        setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
+                        windowParent.style.display = 'none';
+                        WINDOW_CONFIG.visible--;
 
-                        WINDOW_CONFIG.focus = windowParent.classList[0].replace('w-', '');
-                        WINDOW_CONFIG.visible++;
+                        // Odd
+                        visibilityFullSpan();
 
-                        visibilityFullSpan(true);
+                        let a = document.createElement('a');
+                        a.onclick = (e) => {
+                            windowParent.style.display = 'block';
+                            a.remove();
+
+                            WINDOW_CONFIG.focus = windowParent.classList[0].replace('w-', '');
+                            WINDOW_CONFIG.visible++;
+
+                            visibilityFullSpan(true);
+                        }
+                        let lang;
+                        try {
+                            lang = windowParent.querySelector('pre').classList[0].replace('language-', '');
+                        } catch(e) {
+                            lang = '';
+                        }
+                        a.innerHTML = `[${(lang.length > 0 && lang != 'none') ? `${lang.toUpperCase()}-${WINDOW_CONFIG.focus}` : WINDOW_CONFIG.focus}]`
+                        document.querySelector('.hidden-tab').appendChild(a);
                     }
-                    let lang;
-                    try {
-                        lang = windowParent.querySelector('pre').classList[0].replace('language-', '');
-                    } catch(e) {
-                        lang = '';
-                    }
-                    a.innerHTML = `[${(lang.length > 0 && lang != 'none') ? `${lang.toUpperCase()}-${WINDOW_CONFIG.focus}` : WINDOW_CONFIG.focus}]`
-                    document.querySelector('.hidden-tab').appendChild(a);
                 }
             });
             //
