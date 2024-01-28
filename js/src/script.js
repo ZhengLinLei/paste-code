@@ -441,7 +441,31 @@ window.addEventListener('load', () => {
                 // Write tab on tab press
                 if(e.key == 'Tab' || e.keyCode == 9 || e.which == 9) {
                     e.preventDefault();
-                    autoFillFn(" ".repeat(tabSize), tabSize);
+
+                    // Check if text is selected
+                    if(newWindow.selectionStart != newWindow.selectionEnd) {
+                        // Get start and end
+                        const start = newWindow.selectionStart;
+                        const end = newWindow.selectionEnd;
+
+                        // Get text
+                        const text = newWindow.value.substring(start, end);
+
+                        // Add tab
+                        if (start == 0) {
+                            newWindow.value = ' '.repeat(tabSize) + text.replaceAll('\n', '\n' + ' '.repeat(tabSize)) + newWindow.value.substring(end);
+                        } else {
+                            newWindow.value = newWindow.value.substring(0, start) + ' '.repeat(tabSize) + text.replaceAll('\n', '\n' + ' '.repeat(tabSize)) + newWindow.value.substring(end);
+                        }
+
+                        // Update code
+                        _update_code(newWindow);
+
+                        // Select text
+                        newWindow.setSelectionRange(start, end + (tabSize * (text.split('\n').length - 1)));
+                    } else {
+                        autoFillFn(" ".repeat(tabSize), tabSize);
+                    }
                 }
                 // Autofill characters
                 let autoFillDict = {
@@ -474,6 +498,28 @@ window.addEventListener('load', () => {
                     _set_lines(newWindow, delay=0);
                 }
 
+                // Backspace delete 
+                if(e.key == 'Backspace' || e.keyCode == 8 || e.which == 8) {
+                    // if the text before have ${tabSize} spaces, delete all
+                    const start = newWindow.selectionStart;
+
+                    // Get text before
+                    const text = newWindow.value.substring(start - tabSize, start);
+
+                    // Check if text is tabSize spaces
+                    if(text == ' '.repeat(tabSize)) {
+                        // Delete all
+                        newWindow.value = newWindow.value.substring(0, (start - tabSize)+1) + newWindow.value.substring(start);
+
+                        // Update code
+                        _update_code(newWindow);
+
+                        // Fix caret position
+                        newWindow.selectionStart = newWindow.selectionEnd = (start - tabSize)+1;
+                    }
+                }
+
+                
 
                 // ======= SHORTCUTS =======
                 // Select line
