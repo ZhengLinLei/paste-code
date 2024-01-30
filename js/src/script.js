@@ -848,12 +848,11 @@ window.addEventListener('load', () => {
                 }
 
                 let url = "https://" + ROOT.url.host + ROOT.url.pathname + "#" + base64;
-                var result = (type === 'markdown') ? "[paste](" + url + ")" : url;
-                
                 // If auto execution flag is enabled add it to url
                 if (localStorage.getItem(ROOT.localStorage.autoExecuteFlag) == 'true') {
-                    result += "?execute=true";
+                    url += "?execute=true";
                 }
+                var result = (type === 'markdown') ? "[paste](" + url + ")" : url;
 
                 // Copy to clipboard
                 navigator.clipboard.writeText(result);
@@ -1101,8 +1100,8 @@ window.addEventListener('load', () => {
 
             if(e.key == "ArrowLeft" || e.key == "ArrowRight"){
                 // Move caret css
-                let fs = terminalCaret.getBoundingClientRect().width                                                   // - caret width           
-                        - (parseFloat(getComputedStyle(terminalCaret,null).getPropertyValue('border-left-width'))*2)   // - border
+                let fs = terminalCaret.getBoundingClientRect().width                                                    // - caret width           
+                        - (parseFloat(getComputedStyle(terminalCaret,null).getPropertyValue('border-left-width'))*2)    // - border
                         - 0.00001;                                                                                      // - Error                       
 
                 terminalCaret.style.transform = `translateX(-${((terminalInput.innerText.length - TERMINAL_CONFIG.position) * fs)}px)`;
