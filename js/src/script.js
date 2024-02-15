@@ -237,15 +237,19 @@ window.addEventListener('load', () => {
         const index = WINDOW_CONFIG.windows.indexOf(window);
         // Get code window
         const codeWindow = WINDOW_CONFIG.codeWindow[index];
+        const windowParent = window.parentElement.parentElement;
 
         const _LINES = window.value.split('\n')
         // Get lang and set
         let language = _getLang(window);
-        if(language) 
+        if(language) {
             // Set language
             codeWindow.setAttribute('class', `language-${language}`);
+            windowParent.querySelector('.title-w-bar').innerText = `window: ${index} - lang: ${language}`;
+        } else {
+            windowParent.querySelector('.title-w-bar').innerText = `window: ${index}`;
+        }
 
-        
         if (tabRegex.test(window.value))
             window.value = window.value.replaceAll(tabRegex, " ".repeat(tabSize));
 
@@ -318,8 +322,8 @@ window.addEventListener('load', () => {
             // If w-2 is open and w-4
             // The focus span 2 is for w-2
             let hide = [
-                WINDOW_CONFIG.windows[2].parentElement.style.display == 'none',
-                WINDOW_CONFIG.windows[3].parentElement.style.display == 'none'
+                WINDOW_CONFIG.windows[2].parentElement.parentElement.style.display == 'none',
+                WINDOW_CONFIG.windows[3].parentElement.parentElement.style.display == 'none'
             ];
 
             // Check
@@ -334,36 +338,38 @@ window.addEventListener('load', () => {
     const addWindow = () => {
         if (WINDOW_CONFIG.current < WINDOW_CONFIG.max) {
             // Add window
+            WINDOW_CONFIG.current++;
+            let indexW = WINDOW_CONFIG.current-1;
 
             // Add window to array
             const windowParent = document.createElement('div');
             windowParent.addEventListener('click', () => {
-                let index = windowParent.classList[0].replace('w-', '');
-
                 // Set focus
-                WINDOW_CONFIG.focus = index;
+                WINDOW_CONFIG.focus = indexW;
             });
 
-            var timer,          // timer required to reset
-                timeout = 400;  // timer reset in ms
+            const topWBar = document.createElement('div');
+            topWBar.classList.add("top-w-bar");
 
-            window.addEventListener("dblclick", function (evt) {
-                timer = setTimeout(function () {
-                    timer = null;
-                }, timeout);
-            });
-            window.addEventListener("click", function (evt) {
-                if (timer) {
-                    clearTimeout(timer);
-                    timer = null;
+            //
+            const titleWBar = document.createElement('div');
+            titleWBar.classList.add("title-w-bar");
+            titleWBar.innerText = `window: ${indexW}`;
 
-                    // Triple click
-                    // Get focus and close window
-                    if (WINDOW_CONFIG.visible > 1) {
-                        document.querySelector('.hidden-tab').classList.add('demo');
-                        setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
-                        windowParent.style.display = 'none';
-                        WINDOW_CONFIG.visible--;
+            const closeWBar = document.createElement('div');
+            closeWBar.classList.add("close-w-bar");
+            
+            //
+            const closeWindow = document.createElement('a');
+            closeWindow.classList.add("close-w");
+            closeWindow.innerText = "[close]";
+            closeWindow.addEventListener('click', () => {
+                // Get focus and close window
+                if (WINDOW_CONFIG.visible > 1) {
+                    document.querySelector('.hidden-tab').classList.add('demo');
+                    setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
+                    windowParent.style.display = 'none';
+                    WINDOW_CONFIG.visible--;
 
                         // Odd
                         visibilityFullSpan();
@@ -373,22 +379,26 @@ window.addEventListener('load', () => {
                             windowParent.style.display = 'block';
                             a.remove();
 
-                            WINDOW_CONFIG.focus = windowParent.classList[0].replace('w-', '');
-                            WINDOW_CONFIG.visible++;
+                        WINDOW_CONFIG.focus = indexW;
+                        WINDOW_CONFIG.visible++;
 
-                            visibilityFullSpan(true);
-                        }
-                        let lang;
-                        try {
-                            lang = windowParent.querySelector('pre').classList[0].replace('language-', '');
-                        } catch(e) {
-                            lang = '';
-                        }
-                        a.innerHTML = `[${(lang.length > 0 && lang != 'none') ? `${lang.toUpperCase()}-${WINDOW_CONFIG.focus}` : WINDOW_CONFIG.focus}]`
-                        document.querySelector('.hidden-tab').appendChild(a);
+                        visibilityFullSpan(true);
                     }
+                    let lang;
+                    try {
+                        lang = windowParent.querySelector('pre').classList[0].replace('language-', '');
+                    } catch(e) {
+                        lang = '';
+                    }
+                    a.innerHTML = `[${(lang.length > 0 && lang != 'none') ? `${lang.toUpperCase()}-${indexW}` : indexW}]`
+                    document.querySelector('.hidden-tab').appendChild(a);
                 }
             });
+
+
+            // Textarea group
+            const codeGroup = document.createElement('div');
+            codeGroup.classList.add("code-group");
             //
             const codeWindow = document.createElement('pre');
             codeWindow.setAttribute('aria-hidden', 'true');
@@ -618,13 +628,19 @@ window.addEventListener('load', () => {
 
 
             // Insert 
+            closeWBar.appendChild(closeWindow);
+            topWBar.appendChild(titleWBar);
+            topWBar.appendChild(closeWBar);
             codeWindow.appendChild(code);
-            windowParent.appendChild(lineNumbers);
-            windowParent.appendChild(newWindow);
-            windowParent.appendChild(codeWindow);
+            //
+            codeGroup.appendChild(lineNumbers);
+            codeGroup.appendChild(newWindow);
+            codeGroup.appendChild(codeWindow);
+            //
+            windowParent.appendChild(topWBar);
+            windowParent.appendChild(codeGroup);
             WINDOW_CONFIG.parent.appendChild(windowParent);
             WINDOW_CONFIG.windows.push(newWindow);
-            WINDOW_CONFIG.current++;
             WINDOW_CONFIG.visible++;
             WINDOW_CONFIG.parent.classList.remove('odd-3');
             WINDOW_CONFIG.parent.classList.remove('odd-4');
@@ -682,7 +698,7 @@ window.addEventListener('load', () => {
         if (WINDOW_CONFIG.current > WINDOW_CONFIG.min && WINDOW_CONFIG.visible > WINDOW_CONFIG.min) {
             // Remove last visible window
             do {
-                if (WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement.style.display != 'none')
+                if (WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement.parentElement.style.display != 'none')
                     break;
 
                 
@@ -694,7 +710,7 @@ window.addEventListener('load', () => {
 
             const removeOnce = () => {
                 // ---- Remove window
-                WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement);
+                WINDOW_CONFIG.parent.removeChild(WINDOW_CONFIG.windows[WINDOW_CONFIG.focus].parentElement.parentElement);
                 // Remove from array resetting index
                 WINDOW_CONFIG.windows = WINDOW_CONFIG.windows.filter((win, index) => index != WINDOW_CONFIG.focus);
                 // Remove code window ISSUE #7 and #13 resetting index
@@ -707,10 +723,11 @@ window.addEventListener('load', () => {
 
                 // Update class
                 //console.log(WINDOW_CONFIG.windows, WINDOW_CONFIG.codeWindow);   // ISSUE #13
+                console.log(WINDOW_CONFIG.windows);
                 WINDOW_CONFIG.windows.forEach((win, index) => {
                     // Remove all classlist
-                    win.parentElement.classList.remove(...win.parentElement.classList);
-                    win.parentElement.classList.add(`w-${index}`);
+                    win.parentElement.parentElement.classList.remove(...win.parentElement.parentElement.classList);
+                    win.parentElement.parentElement.classList.add(`w-${index}`);
                 });
                 document.querySelector('.hidden-tab').classList.add('demo');
                 setTimeout(() => document.querySelector('.hidden-tab').classList.remove('demo'), 1000);
