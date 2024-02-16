@@ -27,7 +27,7 @@
     --theme-caret-color: #000000;
     --theme-alert-color: rgba(0, 0, 0, 0.8);
     --theme-cristal-color: rgba(0, 0, 0, 0.3);
-    --theme-footer-color: rgba(0, 0, 0, 0.8);
+    --theme-footer-color: rgba(0, 0, 0, 1);
 }
 *{
     box-sizing: border-box;
@@ -206,7 +206,50 @@ body{
         //     height: 3px;
         //     cursor: row-resize;
         // }
-
+        div#library {
+            position: fixed;
+            left: 0;
+            top: 0;
+            transform: translateX(calc(-100% + 3px));
+            opacity: 0;
+            height: 100vh;
+            background-color: var(--theme-secondary-color);
+            border-right: 2px solid var(--theme-border-color);
+            width: 30vw;
+            min-width: 200px;
+            max-width: 300px;
+            z-index: 11;
+            transition: .3s, opacity .2s ease-out;
+            &:hover, &.open {
+                opacity: 1;
+                transform: translateX(0px);
+            }
+            div.window {
+                overflow-y: auto;
+                width: 100%;
+                height: calc(100% - 20px);
+                padding-bottom: 30px;
+                div.list {
+                    padding: 5px;
+                    > div {
+                        display: flex;
+                        padding: 5px;
+                        > a.name {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+            div.add-new {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: calc(100% + 1.5px);
+                padding-top: 1px;
+                background-color: var(--theme-footer-color);
+                color: var(--theme-extra-color);
+            }
+        }
         div.textarea{
             display: grid;
             grid-template-columns: repeat(auto-fit, 2fr); /*minmax(max(215px, 45vw), 2fr));*/
@@ -497,7 +540,7 @@ body{
     .alert-modal {
         visibility: hidden;
         position: fixed;
-        z-index: 100;
+        z-index: 106;
         top: 0;
         left: 50%;
         transform: translate(-50%, -100%);
@@ -517,7 +560,7 @@ body{
         }
     }
     
-    .container-modal {
+    .container-modal, .input-modal {
         display: none;
         position: fixed;
         z-index: 101;
@@ -527,6 +570,19 @@ body{
         width: 100vw;
         align-items: center;
         justify-content: center;
+        input{
+            border: 1px solid var(--theme-bg-color);
+            background: transparent;
+            width: 100%;
+            text-overflow: ellipsis;
+            color: inherit;
+            &:focus{
+                outline: none;
+            }
+        }
+        .stdin {
+            padding: 1px;
+        }
         &.show {
             display: flex;
         }
@@ -586,7 +642,7 @@ body{
         color: var(--theme-extra-color);
         width: 100vw;
         position: fixed;
-        z-index: 99;
+        z-index: 10;
         bottom: 0;
         left: 0;
         .nav-text-offer {

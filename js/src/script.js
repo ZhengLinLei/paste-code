@@ -61,6 +61,19 @@ let setTabSize = (size) => {
     tabSize = size;
 
 };
+
+// One way hash generator
+const hashValue = val =>
+  crypto.subtle
+    .digest('SHA-256', new TextEncoder('utf-8').encode(val))
+    .then(h => {
+      let hexes = [],
+        view = new DataView(h);
+      for (let i = 0; i < view.byteLength; i += 4)
+        hexes.push(('00000000' + view.getUint32(i).toString(16)).slice(-8));
+      return hexes.join('');
+    });
+
 let tabSize = 4, tabRegex = /\t/g;
 // Theme list
 const ThemeArr = ['light', 'dark', 'funky', 'twilight', 'solarized', 'night', 'zll'];
@@ -189,9 +202,15 @@ window.addEventListener('load', () => {
         _get: {},
         localStorage: {
             fileMemory: 'paste-code',
-            autoExecuteFlag: 'paste-code-auto-execute'
+            autoExecuteFlag: 'paste-code-auto-execute',
+            projectList: 'paste-code-list'
         }
     }
+
+    let PROJECT_LIST = {
+        //
+    }
+
     const WINDOW_CONFIG = {
         parent: document.querySelector('.textarea'),
         max: 4,
@@ -210,6 +229,34 @@ window.addEventListener('load', () => {
         document.querySelector('.alert-modal').classList.add('active');
         document.querySelector('.alert-modal-text').textContent = content;
         setTimeout(function() {document.querySelector('.alert-modal').classList.remove('active');}, 5000);
+    }
+
+    let inputPrompt = (content, btn, callback, verify) => {
+        let el = document.querySelector('.input-modal');
+        // Confirm delete window
+        el.querySelector('.modal-text').textContent = content;
+        el.querySelector('#confirm-modal').textContent = `[${btn}]`;
+        // Open modal
+        el.classList.add('show');
+        let inputText = el.querySelector('.stdin input');
+        inputText.focus();
+
+        let callFnc = () => {
+            if (verify(inputText.value)) {
+                callback(inputText.value);
+                el.querySelector('.stdin input').value = "";
+
+                el.classList.remove('show');
+                window.onkeydown = null;
+            }
+        }
+        // Click [yes] --> Close window
+        el.querySelector('#confirm-modal').onclick = callFnc;
+        window.onkeydown = (e) => {
+            if (e.key == 'Enter' || e.keyCode == 13 || e.code == 'Enter' || e.which == 13) {
+                callFnc();
+            }
+        }
     }
 
     // ==== GET LANG ============
@@ -734,19 +781,20 @@ window.addEventListener('load', () => {
             }
 
             // Confirm delete window
-            document.querySelector('.modal-text').textContent = 'Are you sure you want to remove the window [' + WINDOW_CONFIG.focus + ']?';
+            let elP = document.querySelector('.container-modal');
+            elP.querySelector('.modal-text').textContent = 'Are you sure you want to remove the window [' + WINDOW_CONFIG.focus + ']?';
             // Cloning pre
-            document.querySelector('.container-modal .code').innerHTML = "";
-            document.querySelector('.container-modal .code').appendChild(WINDOW_CONFIG.codeWindow[WINDOW_CONFIG.focus].parentElement.cloneNode(true));
+            elP.querySelector('.code').innerHTML = "";
+            elP.querySelector('.code').appendChild(WINDOW_CONFIG.codeWindow[WINDOW_CONFIG.focus].parentElement.cloneNode(true));
             // Open modal
-            document.querySelector('.container-modal').classList.add('show');
+            elP.classList.add('show');
 
             // Click [yes] --> Close window
-            document.getElementById('confirm-modal').onclick = removeOnce;
+            elP.querySelector('#confirm-modal').onclick = removeOnce;
             window.onkeydown = (e) => {
                 if (e.key == 'Enter' || e.keyCode == 13 || e.code == 'Enter' || e.which == 13) {
                     removeOnce();
-                    document.querySelector('.container-modal').classList.remove('show');
+                    elP.classList.remove('show');
                     window.onkeydown = null;
                 }
             }
@@ -960,6 +1008,55 @@ window.addEventListener('load', () => {
         // Remove window
         document.querySelector('#remove-w').addEventListener('click', removeWindow);
 
+        // ==== ADD PROJECT  ==========
+        const addProject = () => {
+            inputPrompt("Project name", "add", (pl) => {
+                _generate_url('url', true, e => {
+                    try {
+                        // Save to localStorage
+                        PROJECT_LIST[pl] = e;
+
+                        localStorage.setItem(ROOT.localStorage.projectList, JSON.stringify(PROJECT_LIST));
+
+                        let d = document.createElement('div');
+                        let a1 = document.createElement('a');
+                        a1.innerText = pl;
+                        a1.classList.add('name');
+                        a1.onclick = () => {
+                            localStorage.setItem(ROOT.localStorage.fileMemory, e);
+                            document.location = document.location;
+                        }
+                        let a2 = document.createElement('a');
+                        a2.onclick = (e) => {
+                            e.target.parentElement.remove();
+                            delete PROJECT_LIST[pl];
+                            localStorage.setItem(ROOT.localStorage.projectList, JSON.stringify(PROJECT_LIST));
+                            alertModal(`Project "${pl}"deleted`);
+                        }
+                        a2.innerText = `[delete]`;
+                        d.append(a1);
+                        d.append(a2);
+                        document.querySelector('#library .window .list').append(d);
+                    }
+                    catch (e) {
+                        alertModal('Error saving');
+                    }
+                });
+            }, (pl) => {
+                const globalRegex = new RegExp('^[A-Za-z0-9_\-]+$');
+                if (!globalRegex.test(pl)) {
+                    alertModal('Project name not allowed');
+                    return false;
+                }
+                if (pl in PROJECT_LIST) {
+                    alertModal('Project already exist');
+                    return false;
+                }
+
+                return true;
+            });
+        }
+        document.querySelector('.add-new .add').addEventListener('click', addProject);
 
         // ==== URL GENERATOR =========
         document.querySelectorAll('.generate-url').forEach(btn => {
@@ -984,12 +1081,15 @@ window.addEventListener('load', () => {
         });
 
         // === MODAL ALERT ===
-        const modalRemoveShow = () => { 
-            document.querySelector('.container-modal').classList.remove('show'); 
+        const modalRemoveShow = (type) => { 
+            document.querySelector('.'+type+'-modal').classList.remove('show'); 
             window.onkeydown = null; 
         }
-        document.querySelector('.container-modal .bg-event').addEventListener('click', modalRemoveShow);
-        ['confirm-modal', 'cancel-modal'].forEach(el => document.getElementById(el).addEventListener('click', modalRemoveShow));
+        document.querySelector('.container-modal .bg-event').addEventListener('click', () => modalRemoveShow('container'));
+        ['confirm-modal', 'cancel-modal'].forEach(el => document.querySelector(`.container-modal #${el}`).addEventListener('click', () => modalRemoveShow('container')));
+
+        document.querySelector('.input-modal .bg-event').addEventListener('click', () => modalRemoveShow('input'));
+        ['cancel-modal'].forEach(el => document.querySelector(`.input-modal #${el}`).addEventListener('click', () => modalRemoveShow('input')));
 
         // ==== TERMINAL =========
         _toggle_terminal = (type="toggle") => {
@@ -1252,6 +1352,36 @@ window.addEventListener('load', () => {
 
             if(w > _MIN && w < _MAX)
                 (document.documentElement || document.querySelector(':root')).style.setProperty('--termOption', `${w}px`);
+        }
+
+        if (localStorage.getItem(ROOT.localStorage.projectList)) {
+            PROJECT_LIST = JSON.parse(localStorage.getItem(ROOT.localStorage.projectList));
+
+            function addProjectRow(name, content) {
+                let d = document.createElement('div');
+                let a1 = document.createElement('a');
+                a1.innerText = name;
+                a1.classList.add('name');
+                a1.onclick = () => {
+                    localStorage.setItem(ROOT.localStorage.fileMemory, content);
+                    document.location = document.location;
+                }
+                let a2 = document.createElement('a');
+                a2.onclick = (e) => {
+                    e.target.parentElement.remove();
+                    delete PROJECT_LIST[name];
+                    localStorage.setItem(ROOT.localStorage.projectList, JSON.stringify(PROJECT_LIST));
+                    alertModal(`Project "${name}"deleted`);
+                }
+                a2.innerText = `[delete]`;
+                d.append(a1);
+                d.append(a2);
+                document.querySelector('#library .window .list').append(d);
+            }
+
+            Object.keys(PROJECT_LIST).forEach(function(key) {
+                addProjectRow(key, PROJECT_LIST[key]);
+            });
         }
 
         // Check if terminal is open

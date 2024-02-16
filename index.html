@@ -12,6 +12,16 @@
 </head>
 <body>
     <main>
+        <div id="library">
+            <div class="window">
+                <div class="list">
+                    <!-- Library List -->
+                </div>
+            </div>
+            <div class="add-new">
+                <a class="add">[save project]</a>
+            </div>
+        </div>
         <div class="textarea">
             <!-- Code editor -->
         </div>
@@ -87,6 +97,19 @@
         <div class="prompt-modal">
             <p class="modal-text">Are you sure you want to remove the window?</p>
             <div class="code">
+            </div>
+            <div class="option-modal">
+                <a id="confirm-modal">[yes]</a>
+                <a id="cancel-modal">[cancel]</a>
+            </div>
+        </div>
+    </div>
+    <div class="input-modal">
+        <div class="bg-event"></div>
+        <div class="prompt-modal">
+            <p class="modal-text">Project Name</p>
+            <div class="stdin">
+                <input type="text">
             </div>
             <div class="option-modal">
                 <a id="confirm-modal">[yes]</a>
